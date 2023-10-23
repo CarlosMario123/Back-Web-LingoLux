@@ -35,7 +35,7 @@ class ServerApi {
   }
 
   routes() {
-    this.app.use(this.usuariosRoutes,require('../routes/usuarios.js'))
+    this.app.use(this.usuariosRoutes,require('../routes/usuarios.routes'))
   }
 
   listen() {
