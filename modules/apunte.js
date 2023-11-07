@@ -1,12 +1,12 @@
 const { Schema, model } = require("mongoose");
 
-const libroVocabularioSchema = Schema({
+const apunteSchema = new Schema({
   titulo: {
     type: String,
     required: [true, "El título es requerido"],
   },
   contenido: {
-    type: String,
+    type: [String],
   },
   createdAt: {
     type: Date,
@@ -33,5 +33,4 @@ const libroVocabularioSchema = Schema({
   },
 });
 
-
-module.exports = model("libroVocabulario", libroVocabularioSchema);
+module.exports = model("Apunte", apunteSchema);

@@ -6,38 +6,39 @@ const {
   usuariosPost,
   usuariosDelete,
   usuariosPatch,
-  loginUsuario
+  loginUsuario,
 } = require("../controllers/usuarios.controller");
 const { check } = require("express-validator");
-const { validarCampos } = require('../middlewares/validar-campos.js');
+const { validarCampos } = require("../middlewares/validar-campos.js");
 const { existeEmial } = require("../helpers/db-validator");
+const { authMiddleware } = require("../middlewares/authMiddleware");
 
-const routerProduct = Router();
+const routerUsuario = Router();
 
-routerProduct.get("/", usuariosGet);
+routerUsuario.get("/", usuariosGet);
 
+routerUsuario.put("/:id",authMiddleware ,usuariosPut);
 
-routerProduct.put("/:id", usuariosPut);
-
-routerProduct.post(
+routerUsuario.post(
   "/",
   [
     check("nombre", "El nombre es obligatorio").not().isEmpty(),
     check("password", "La contraseña es obligatoria").not().isEmpty(),
-    check("password", "La contraseña debe de ser mayor a 6 letras").isLength({min: 6}),
+    check("password", "La contraseña debe de ser mayor a 6 letras").isLength({
+      min: 6,
+    }),
     check("correo", "El correo no es válido").isEmail(),
-    check('correo').custom(existeEmial),
-    validarCampos
+    check("correo").custom(existeEmial),
+    validarCampos,
+    authMiddleware
   ],
   usuariosPost
 );
 
-routerProduct.post("/login", [
- validarCampos
-], loginUsuario);
+routerUsuario.post("/login", [validarCampos], loginUsuario);
 
-routerProduct.delete("/:id", usuariosDelete);
+routerUsuario.delete("/:id", [authMiddleware, validarCampos], usuariosDelete);
 
-routerProduct.patch("/", usuariosPatch);
+routerUsuario.patch("/", usuariosPatch);
 
-module.exports = routerProduct;
+module.exports = routerUsuario;
