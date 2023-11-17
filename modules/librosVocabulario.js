@@ -5,9 +5,7 @@ const libroVocabularioSchema = Schema({
     type: String,
     required: [true, "El título es requerido"],
   },
-  contenido: {
-    type: String,
-  },
+  contenido: [{ contenidoEsp: String, contenidoIng: String, url:String }],
   createdAt: {
     type: Date,
     default: Date.now,

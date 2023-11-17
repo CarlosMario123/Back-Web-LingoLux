@@ -9,8 +9,8 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 const routerLibrosHistorias = Router();
 
 // Rutas
-routerLibrosHistorias.get("/", authMiddleware, obtenerLibros);
-routerLibrosHistorias.post("/", authMiddleware, crearLibro);
+routerLibrosHistorias.get("/", obtenerLibros);
+routerLibrosHistorias.post("/", crearLibro);
 routerLibrosHistorias.put("/:id", authMiddleware, actualizarLibro);
 routerLibrosHistorias.delete("/:id", authMiddleware, eliminarLibro);
 

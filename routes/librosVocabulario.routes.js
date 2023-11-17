@@ -9,8 +9,8 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 const routerLibroVocabulario = Router();
 
 // Rutas
-routerLibroVocabulario.get("/", authMiddleware, obtenerLibros);
-routerLibroVocabulario.post("/", authMiddleware, crearLibro);
+routerLibroVocabulario.get("/", obtenerLibros);
+routerLibroVocabulario.post("/", crearLibro);
 routerLibroVocabulario.put("/:id", authMiddleware, actualizarLibro);
 routerLibroVocabulario.delete("/:id", authMiddleware, eliminarLibro);
 

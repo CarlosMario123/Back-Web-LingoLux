@@ -30,25 +30,18 @@ const obtenerLibros = async (req, res) => {
 
 // Controlador para crear un nuevo libro de vocabulario
 const crearLibro = async (req, res) => {
-  const { titulo, contenido } = req.body;
-
   try {
-    const nuevoLibro = new LibroVocabulario({
-      titulo,
-      contenido,
-      createdBy: req.usuario.id, // Establece el usuario creador
-    });
+    // Crea una nueva instancia del modelo con los datos del cuerpo de la solicitud
+    const nuevoLibro = new LibroVocabulario(req.body);
 
+    // Guarda el nuevo libro en la base de datos
     await nuevoLibro.save();
 
-    res.status(201).json({
-      libro: nuevoLibro,
-    });
+    // Devuelve una respuesta exitosa
+    res.status(201).json({ mensaje: "Libro de vocabulario creado exitosamente", libro: nuevoLibro });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al crear el libro de vocabulario",
-    });
+    // Maneja los errores y devuelve una respuesta de error
+    res.status(500).json({ error: "Error al crear el libro de vocabulario" });
   }
 };
 
