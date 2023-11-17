@@ -10,6 +10,4 @@ const generadorSchema = Schema({
   respuestas: [String],
 });
 
-
-
-module.exports = model("generaoor", generadorSchema);
+module.exports = model("generadore", generadorSchema);
