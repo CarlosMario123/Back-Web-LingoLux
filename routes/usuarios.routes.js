@@ -7,15 +7,22 @@ const {
   usuariosDelete,
   usuariosPatch,
   loginUsuario,
+  obtenerUsuarioID,
 } = require("../controllers/usuarios.controller");
 const { check } = require("express-validator");
 const { validarCampos } = require("../middlewares/validar-campos.js");
-const { existeEmial } = require("../helpers/db-validator");
+const { existeEmial, existeID } = require("../helpers/db-validator");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 
 const routerUsuario = Router();
 
 routerUsuario.get("/", usuariosGet);
+
+routerUsuario.get('/:id',[
+  check('id','El id no es valido').isMongoId(),
+  check('id', 'El id no existe').custom(existeID),
+  validarCampos
+],obtenerUsuarioID)
 
 routerUsuario.put("/:id",authMiddleware ,usuariosPut);
 

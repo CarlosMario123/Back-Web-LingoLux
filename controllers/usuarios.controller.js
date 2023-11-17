@@ -30,6 +30,26 @@ const usuariosGet = async (req = request, res = response) => {
   }
 };
 
+const obtenerUsuarioID =async(req = request, res = response) =>{
+  try {
+    const id = req.params.id;
+    if (!id) {
+      return res.status(404).json({msg:`EL usuario con el id ${id} no existe`})
+    }
+    const usuario = await Usuario.findById({id});
+  
+    res.json({
+      msg:"usuario encontrado",
+      usuario
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: 'Error al hacer la peticion'
+    })
+  }
+}
+
 
 const usuariosPut = async (req, res = response) => {
   const id = req.params.id;
@@ -185,6 +205,7 @@ const usuariosPatch = (req, res = response) => {
 
 module.exports = {
   usuariosGet,
+  obtenerUsuarioID,
   usuariosPut,
   usuariosPatch,
   usuariosDelete,

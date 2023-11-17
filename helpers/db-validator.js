@@ -1,3 +1,4 @@
+const usuario = require('../modules/usuario');
 const Usuario = require('../modules/usuario')
 
 const existeEmial = async(correo ='') =>{
@@ -8,6 +9,15 @@ const existeEmial = async(correo ='') =>{
     }
 }
 
+const existeID = async(id = '')=>{
+    const idExiste = await usuario.findOne({id});
+
+    if (!idExiste) {
+        throw new Error(`EL id ${idExiste} no es valido`)
+    }
+}
+
 module.exports ={
-    existeEmial
+    existeEmial,
+    existeID
 }
