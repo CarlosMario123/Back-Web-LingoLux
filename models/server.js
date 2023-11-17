@@ -8,7 +8,10 @@ class ServerApi {
     this.usuariosRoutes = "/API/usuarios";
     this.libroVocRoutes = "/API/libroVocabulario";
     this.libroHisRoutes = "/API/libroHistorias";
-    this.apunte = '/API/apuntes'
+    this.apunte = '/API/apuntes';
+    this.lecciones = '/API/lecciones';
+    this.temas = '/API/temas';
+    this.preguntas = '/API/preguntas'
     //Conectar a base de datos
     this.conectarDB();
 
@@ -37,7 +40,10 @@ class ServerApi {
     this.app.use(this.usuariosRoutes, require("../routes/usuarios.routes")),
     this.app.use(this.libroVocRoutes,require("../routes/librosVocabulario.routes")),
     this.app.use(this.libroHisRoutes,require("../routes/librosHistorias.routes"));
-    this.app.use(this.apunte,require('../routes/apunte.routes'))
+    this.app.use(this.apunte,require('../routes/apunte.routes'));
+    this.app.use(this.lecciones,require('../routes/lecciones.route'));
+    this.app.use(this.temas,require('../routes/temas.route'));
+    this.app.use(this.preguntas,require('../routes/preguntas.route'));
   }
 
   listen() {

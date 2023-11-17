@@ -114,7 +114,7 @@ const loginUsuario = async (req, res = response) => {
     // Si el inicio de sesión es exitoso, genera un token JWT
     const payload = {
       usuario: {
-        id: usuario.id,
+        id: usuario._id,
       },
     };
 

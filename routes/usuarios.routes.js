@@ -15,7 +15,7 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 
 const routerUsuario = Router();
 
-routerUsuario.get("/", usuariosGet);
+routerUsuario.get("/", authMiddleware, usuariosGet);
 
 routerUsuario.put("/:id",authMiddleware ,usuariosPut);
 
@@ -29,8 +29,7 @@ routerUsuario.post(
     }),
     check("correo", "El correo no es válido").isEmail(),
     check("correo").custom(existeEmial),
-    validarCampos,
-    authMiddleware
+    validarCampos
   ],
   usuariosPost
 );

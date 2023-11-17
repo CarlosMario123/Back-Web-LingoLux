@@ -1,18 +1,16 @@
 const { Router } = require("express");
 const leccionesRouter = require("../controllers/lecciones.controller.js");
+const { authMiddleware } = require("../middlewares/authMiddleware.js");
+const routerLeccion = Router();
 
-const routerProduct = Router();
+routerLeccion.get("/", authMiddleware, leccionesRouter.obtenerLecciones);
 
-routerProduct.get("/", leccionesRouter.leccionesGet);
+routerLeccion.get("/:id", authMiddleware, leccionesRouter.consultarLeccion);
 
-routerProduct.get("/:id", leccionesRouter.leccionesGetById);
+routerLeccion.post("/", authMiddleware, leccionesRouter.agregarLeccion);
 
-routerProduct.post("/", leccionesRouter.leccionesPost);
+routerLeccion.delete("/:id", authMiddleware, leccionesRouter.eliminarLeccion);
 
-routerProduct.delete("/:id", leccionesRouter.leccionesDelete);
+routerLeccion.patch("/:id", authMiddleware, leccionesRouter.editarLeccion);
 
-routerProduct.put("/:id", leccionesRouter.leccionesPut);
-
-routerProduct.patch("/:id", leccionesRouter.leccionesPatch);
-
-module.exports = routerProduct;
+module.exports = routerLeccion;

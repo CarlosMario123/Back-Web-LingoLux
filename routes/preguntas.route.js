@@ -1,20 +1,18 @@
 const { Router } = require("express");
 const preguntasRouter = require("../controllers/preguntas.controller.js");
+const { authMiddleware } = require("../middlewares/authMiddleware.js");
+const routerPregunta = Router();
 
-const routerProduct = Router();
+routerPregunta.get("/", authMiddleware, preguntasRouter.obtenerPreguntas);
 
-routerProduct.get("/", preguntasRouter.preguntasGet);
+routerPregunta.get("/:id", authMiddleware, preguntasRouter.consultarPregunta);
 
-routerProduct.get("/:id", preguntasRouter.preguntasGetById);
+routerPregunta.post("/", authMiddleware, preguntasRouter.agregarPregunta);
 
-routerProduct.post("/", preguntasRouter.preguntasPost);
+routerPregunta.post("/:id", authMiddleware, preguntasRouter.respuestaCorrecta);
 
-routerProduct.post("/:id", preguntasRouter.respuestaCorrecta);
+routerPregunta.delete("/:id", authMiddleware, preguntasRouter.eliminarPregunta);
 
-/* routerProduct.delete("/:id", preguntasRouter.temasDelete);
+routerPregunta.patch("/:id", authMiddleware, preguntasRouter.editarPregunta);
 
-routerProduct.put("/:id", preguntasRouter.temasPut);
-
-routerProduct.patch("/:id", preguntasRouter.temasPatch); */
-
-module.exports = routerProduct;
+module.exports = routerPregunta;

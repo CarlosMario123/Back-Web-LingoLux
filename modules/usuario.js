@@ -14,23 +14,17 @@ const userSchema = Schema({
     type: String,
     required: [true, "La contraseña es requerida"],
   },
-  etapas: {
-    type: String,
-  },
   can_estrellas: {
     type: Number,
-  },
-  nivel: {
-    type: Number,
+    default: 0
   },
   puntaje: {
     type: Number,
-  },
-  cuestionarios_compt: {
-    type: Number,
+    default: 0
   },
   lecciones_compt: {
     type: Number,
+    default: 0
   },
   createdAt: {
     type: Date,

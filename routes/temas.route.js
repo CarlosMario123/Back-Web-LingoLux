@@ -1,18 +1,16 @@
 const { Router } = require("express");
 const temasRouter = require("../controllers/temas.controller.js");
+const { authMiddleware } = require("../middlewares/authMiddleware.js");
+const routerTema = Router();
 
-const routerProduct = Router();
+routerTema.get("/", authMiddleware, temasRouter.obtenerTemas);
 
-routerProduct.get("/", temasRouter.temasGet);
+routerTema.get("/:id", authMiddleware, temasRouter.consultarTema);
 
-routerProduct.get("/:id", temasRouter.temasGetById);
+routerTema.post("/", authMiddleware, temasRouter.agregarTema);
 
-routerProduct.post("/", temasRouter.temasPost);
+routerTema.delete("/:id", authMiddleware, temasRouter.eliminarTema);
 
-routerProduct.delete("/:id", temasRouter.temasDelete);
+routerTema.patch("/:id", authMiddleware, temasRouter.editarTema);
 
-routerProduct.put("/:id", temasRouter.temasPut);
-
-routerProduct.patch("/:id", temasRouter.temasPatch);
-
-module.exports = routerProduct;
+module.exports = routerTema;

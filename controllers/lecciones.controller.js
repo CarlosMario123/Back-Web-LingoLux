@@ -1,9 +1,31 @@
 const Leccion = require("../modules/leccion");
+const Usuario = require("../modules/usuario");
 
-const leccionesGet = async (req, res) => {
+const obtenerLecciones = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage) || 10;
+  const sortBy = req.query.sortBy || 'createdAt';
+  const sortOrder = req.query.sortOrder || 'asc';
+  const skip = (page - 1) * perPage;
+  const sortOption = { [sortBy]: sortOrder };
+
+  const usuario = await Usuario.findById(req.usuario.id);
+  const usuarioAuth = {
+    idUsuario: usuario._id,
+    username: usuario.nombre,
+    estrellas: usuario.can_estrellas,
+    completados: usuario.lecciones_compt,
+  }
   try {
-    const lecciones = await Leccion.find().populate(['temas', 'preguntas']);
-    return res.status(200).json({ lecciones });
+    const lecciones = await Leccion.find()
+      .sort(sortOption)
+      .skip(skip)
+      .limit(perPage);
+
+    return res.status(200).json({
+      usuarioAuth,
+      lecciones
+    });
 
   } catch (error) {
     console.error(error);
@@ -14,17 +36,28 @@ const leccionesGet = async (req, res) => {
   }
 };
 
-const leccionesGetById = async (req, res) => {
+const consultarLeccion = async (req, res) => {
   try {
     const idLeccion = req.params.id;
-    const leccion = await Leccion.findById(idLeccion).populate(['temas', 'preguntas']);
+    const leccion = await Leccion.findById(idLeccion);
+    const usuario = await Usuario.findById(req.usuario.id);
 
     if (!leccion) {
       return res.status(404).json({
-        message: 'Lección no localizada'
+        message: 'Lección no localizada',
       })
     }
-    return res.json({ data: leccion });
+    if (usuario.can_estrellas < leccion.requisito) {
+      return res.status(401).json({
+        message: 'Lección bloqueada',
+      })
+    } else {
+      return res.status(200).json({
+        idUsuario: req.usuario.id,
+        usuario: req.usuario.nombre,
+        leccion
+      });
+    }
 
   } catch (error) {
     console.error(error);
@@ -34,7 +67,7 @@ const leccionesGetById = async (req, res) => {
   }
 };
 
-const leccionesPost = async (req, res) => {
+const agregarLeccion = async (req, res) => {
   const { titulo, temas, preguntas } = req.body;
   try {
     const leccion = new Leccion({ titulo, temas, preguntas });
@@ -52,7 +85,7 @@ const leccionesPost = async (req, res) => {
   }
 };
 
-const leccionesDelete = async (req, res) => {
+const eliminarLeccion = async (req, res) => {
   const idLeccion = req.params.id;
   try {
     const leccion = await Leccion.findByIdAndDelete(idLeccion);
@@ -74,39 +107,12 @@ const leccionesDelete = async (req, res) => {
   }
 };
 
-const leccionesPut = async (req, res) => {
-  const idLeccion = req.params.id;
-
-  try {
-    const datosEditar = {
-      titulo: req.body.titulo || null
-    };
-    const leccion = await Leccion.findByIdAndUpdate(idLeccion, datosEditar);
-
-    if (!leccion) {
-      return res.status(404).json({
-        msg: "Lección no localizada",
-      });
-    }
-
-    return res.status(200).json({
-      msg: "Lección actualizada correctamente"
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      msg: "Error al actualizar la lección",
-    });
-  }
-};
-
-const leccionesPatch = async (req, res) => {
+const editarLeccion = async (req, res) => {
   const idLeccion = req.params.id;
 
   try {
     const { titulo, temas, preguntas } = req.body;
-    const datosEditar = { titulo, temas, preguntas };
+    const datosEditar = { titulo, temas, preguntas, updatedAt: new Date() };
     const leccion = await Leccion.findByIdAndUpdate(idLeccion, datosEditar);
 
     if (!leccion) {
@@ -128,10 +134,9 @@ const leccionesPatch = async (req, res) => {
 };
 
 module.exports = {
-  leccionesGet,
-  leccionesGetById,
-  leccionesPost,
-  leccionesPut,
-  leccionesPatch,
-  leccionesDelete,
+  obtenerLecciones,
+  consultarLeccion,
+  agregarLeccion,
+  eliminarLeccion,
+  editarLeccion,
 };

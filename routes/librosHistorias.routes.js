@@ -4,7 +4,7 @@ const {
   crearLibro,
   actualizarLibro,
   eliminarLibro,
-} = require("../controllers/librosHistorias.routes");
+} = require("../controllers/librosHistorias.controller");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const routerLibrosHistorias = Router();
 
