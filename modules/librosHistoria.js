@@ -5,9 +5,7 @@ const libroHistoriaSchema = Schema({
     type: String,
     required: [true, "El titulo es requerido "],
   },
-  contenido: {
-    type: String,
-  },
+  contenido: [{ contenidoEsp: String, contenidoIng: String }],
   createdAt: {
     type: Date,
     default: Date.now,

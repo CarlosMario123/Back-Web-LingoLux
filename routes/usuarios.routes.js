@@ -37,7 +37,6 @@ routerUsuario.post(
     check("correo", "El correo no es válido").isEmail(),
     check("correo").custom(existeEmial),
     validarCampos,
-    authMiddleware
   ],
   usuariosPost
 );
