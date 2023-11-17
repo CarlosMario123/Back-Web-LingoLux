@@ -1,3 +1,4 @@
+const { request, response } = require("express");
 const libroHistorias = require("../modules/librosHistoria");
 
 // Controlador para obtener todos los libros de vocabulario
@@ -14,6 +15,32 @@ const obtenerLibros = async (req, res) => {
     });
   }
 };
+
+const obtenerLibro = async(req = request, res = response)=>{
+  const id = req.params.id;
+
+  console.log(id);
+
+  try {
+    const libro = await libroHistorias.findById(id);
+
+    if (!libro) {
+      return res.status(404).json({
+        msg: "Libro de historias no encontrado",
+      });
+    }
+
+    res.status(200).json({
+      libro,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al obtener el libro de historias por ID",
+    });
+  }
+
+}
 
 // Controlador para crear un nuevo libro de vocabulario
 const crearLibro = async (req, res) => {
@@ -128,4 +155,5 @@ module.exports = {
   crearLibro,
   actualizarLibro,
   eliminarLibro:eliminarLibroLog,
+  obtenerLibro
 };
