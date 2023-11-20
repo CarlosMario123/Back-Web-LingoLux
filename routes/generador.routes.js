@@ -17,7 +17,4 @@ router.put("/:id", actualizarGenerador);
 // Ruta para eliminar lógicamente un generador por su ID
 router.delete("/:id", eliminarGeneradorLog);
 
-// Ruta para eliminar físicamente un generador por su ID
-router.delete("/fisicamente/:id", eliminarGeneradorFis);
-
 module.exports = router;

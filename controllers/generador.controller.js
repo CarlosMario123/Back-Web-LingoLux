@@ -116,7 +116,7 @@ const eliminarGeneradorLog = async (req, res) => {
     await generador.deleteOne();
 
     res.status(200).json({
-      msg: "Generador eliminado lógicamente",
+      msg: "Generador eliminado",
     });
   } catch (error) {
     console.error(error);
@@ -126,31 +126,6 @@ const eliminarGeneradorLog = async (req, res) => {
   }
 };
 
-// Controlador para eliminar físicamente un generador por su ID
-const eliminarGeneradorFis = async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const generador = await Generador.findById(id);
-
-    if (!generador) {
-      return res.status(404).json({
-        msg: "Generador no encontrado",
-      });
-    }
-
-    await generador.deleteOne({ _id: id });
-
-    res.status(200).json({
-      msg: "Generador eliminado físicamente",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al eliminar el generador",
-    });
-  }
-};
 
 module.exports = {
   obtenerGeneradores,
@@ -158,5 +133,4 @@ module.exports = {
   crearGenerador,
   actualizarGenerador,
   eliminarGeneradorLog,
-  eliminarGeneradorFis,
 };
