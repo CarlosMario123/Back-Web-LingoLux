@@ -1,10 +1,10 @@
 const { request, response } = require("express");
-const libroHistorias = require("../modules/librosHistoria");
+const LibroHistorias = require("../modules/librosHistoria");
 
 // Controlador para obtener todos los libros de vocabulario
 const obtenerLibros = async (req, res) => {
   try {
-    const libros = await libroHistorias.find({ deleted: false });
+    const libros = await LibroHistorias.find({ deleted: false });
     res.status(200).json({
       libros,
     });
@@ -22,7 +22,7 @@ const obtenerLibro = async(req = request, res = response)=>{
   console.log(id);
 
   try {
-    const libro = await libroHistorias.findById(id);
+    const libro = await LibroHistorias.findById(id);
 
     if (!libro) {
       return res.status(404).json({
@@ -42,20 +42,17 @@ const obtenerLibro = async(req = request, res = response)=>{
 
 }
 
-// Controlador para crear un nuevo libro de vocabulario
-const crearLibro = async (req, res) => {
+// Controlador para crear un nuevo libro de historias
+const crearLibro = async (req = request, res) => {
   try {
-    // Crea una nueva instancia del modelo con los datos del cuerpo de la solicitud
-    const nuevoLibro = new libroHistorias(req.body);
-
-    // Guarda el nuevo libro en la base de datos
+    // Usa el modelo correcto para crear una nueva instancia
+    const nuevoLibro = new LibroHistorias(req.body);
     await nuevoLibro.save();
 
-    // Devuelve una respuesta exitosa
-    res.status(201).json({ mensaje: "Libro creado exitosamente", libro: nuevoLibro });
+    res.status(201).json({ mensaje: "Libro de historias creado exitosamente", libro: nuevoLibro });
   } catch (error) {
-    // Maneja los errores y devuelve una respuesta de error
-    res.status(500).json({ error: "Error al crear el libro" });
+    console.error(error);
+    res.status(500).json({ msg: "Error al crear el libro de historias" });
   }
 };
 
@@ -65,7 +62,7 @@ const actualizarLibro = async (req, res) => {
   const { titulo, contenido } = req.body;
 
   try {
-    const libro = await libroHistorias.findById(id);
+    const libro = await LibroHistorias.findById(id);
 
     if (!libro) {
       return res.status(404).json({
@@ -97,7 +94,7 @@ const eliminarLibroLog = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const libro = await libroHistorias.findById(id);
+    const libro = await LibroHistorias.findById(id);
 
     if (!libro) {
       return res.status(404).json({
@@ -127,7 +124,7 @@ const eliminarLibroFis = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const libro = await libroHistorias.findById(id);
+    const libro = await LibroHistorias.findById(id);
 
     if (!libro) {
       return res.status(404).json({
