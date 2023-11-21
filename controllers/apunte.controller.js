@@ -53,6 +53,42 @@ const crearApunte = async (req, res) => {
   }
 };
 
+const actualizarApuntePorUsuario = async (req, res) => {
+  const idUsuario = req.params.idUsuario;
+  const idApunte = req.params.idApunte;
+  const { titulo, contenido } = req.body;
+
+  try {
+    // Find and update the apunte for the specified user
+    const updatedApunte = await Apunte.findByIdAndUpdate(
+      { _id: idApunte, createdBy: idUsuario },
+      {
+        titulo,
+        contenido,
+        updatedAt: new Date(),
+        updatedBy: req.usuario.id, // Update with the current user ID
+      },
+      { new: true } // To return the updated document
+    );
+
+    if (!updatedApunte) {
+      return res.status(404).json({
+        msg: "Apunte no encontrado para el usuario especificado",
+      });
+    }
+
+    res.status(200).json({
+      msg: "Apunte actualizado correctamente",
+      apunte: updatedApunte,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al actualizar el apunte",
+    });
+  }
+}
+
 // Controlador para actualizar un apunte
 const actualizarApunte = async (req = request, res) => {
   const id = req.params.id;
@@ -178,4 +214,5 @@ module.exports = {
   actualizarApunte,
   eliminarApunte: eliminarApunteLogico,
   obtenerApuntesPorUsuario,
+  actualizarApuntePorUsuario
 };

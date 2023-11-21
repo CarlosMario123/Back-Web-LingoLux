@@ -5,6 +5,7 @@ const {
   actualizarApunte,
   eliminarApunte,
   obtenerApuntesPorUsuario,
+  actualizarApuntePorUsuario,
 } = require("../controllers/apunte.controller.js");
 const { check } = require("express-validator");
 const { validarCampos } = require("../middlewares/validar-campos.js");
@@ -37,5 +38,15 @@ routerApuntes.put(
 );
 
 routerApuntes.delete("/:id", [authMiddleware], eliminarApunte);
+
+routerApuntes.put(
+  "/usuario/:idUsuario/apunte/:idApunte",
+  [
+    check("titulo", "El título es obligatorio").not().isEmpty(),
+    validarCampos,
+    authMiddleware,
+  ],
+  actualizarApuntePorUsuario
+);
 
 module.exports = routerApuntes;
