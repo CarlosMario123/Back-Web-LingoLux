@@ -1,5 +1,5 @@
 const { response, request } = require("express");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const Usuario = require("../modules/usuario");
 const bcryptjs = require("bcryptjs");
 
@@ -7,13 +7,13 @@ const usuariosGet = async (req = request, res = response) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const perPage = parseInt(req.query.perPage) || 10;
-    const sortBy = req.query.sortBy || 'createdAt';
-    const sortOrder = req.query.sortOrder || 'asc';
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder || "asc";
 
     const skip = (page - 1) * perPage;
-    
+
     const sortOption = { [sortBy]: sortOrder };
-    
+
     const usuarios = await Usuario.find({ deleted: false })
       .sort(sortOption)
       .skip(skip)
@@ -25,31 +25,32 @@ const usuariosGet = async (req = request, res = response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      msg: 'Error al obtener los usuarios',
+      msg: "Error al obtener los usuarios",
     });
   }
 };
 
-const obtenerUsuarioID =async(req = request, res = response) =>{
+const obtenerUsuarioID = async (req = request, res = response) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(404).json({msg:`EL usuario con el id ${id} no existe`})
+      return res
+        .status(404)
+        .json({ msg: `EL usuario con el id ${id} no existe` });
     }
-    const usuario = await Usuario.findById({id});
-  
+    const usuario = await Usuario.findById({ id });
+
     res.json({
-      msg:"usuario encontrado",
-      usuario
-    })
+      msg: "usuario encontrado",
+      usuario,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: 'Error al hacer la peticion'
-    })
+      msg: "Error al hacer la peticion",
+    });
   }
-}
-
+};
 
 const usuariosPut = async (req, res = response) => {
   const id = req.params.id;
@@ -92,8 +93,28 @@ const usuariosPut = async (req, res = response) => {
 };
 
 const usuariosPost = async (req, res = response) => {
-  const { nombre, correo, password, etapas,can_estrellas,nivel,puntaje,cuestionarios_compt,lecciones_compt } = req.body;
-  const usuario = new Usuario({ nombre, correo, password, etapas, can_estrellas,nivel,puntaje,cuestionarios_compt,lecciones_compt });
+  const {
+    nombre,
+    correo,
+    password,
+    etapas,
+    can_estrellas,
+    nivel,
+    puntaje,
+    cuestionarios_compt,
+    lecciones_compt,
+  } = req.body;
+  const usuario = new Usuario({
+    nombre,
+    correo,
+    password,
+    etapas,
+    can_estrellas,
+    nivel,
+    puntaje,
+    cuestionarios_compt,
+    lecciones_compt,
+  });
 
   //encriptar contraseña
   const salt = bcryptjs.genSaltSync(10);
@@ -118,7 +139,7 @@ const loginUsuario = async (req, res = response) => {
 
     if (!usuario) {
       return res.status(400).json({
-        msg: 'Usuario no encontrado. Verifica tus credenciales.',
+        msg: "Usuario no encontrado. Verifica tus credenciales.",
       });
     }
 
@@ -127,7 +148,7 @@ const loginUsuario = async (req, res = response) => {
 
     if (!validPassword) {
       return res.status(400).json({
-        msg: 'Contraseña incorrecta. Verifica tus credenciales.',
+        msg: "Contraseña incorrecta. Verifica tus credenciales.",
       });
     }
 
@@ -139,19 +160,19 @@ const loginUsuario = async (req, res = response) => {
     };
 
     // Clave secreta para firmar el token
-    const privateKey = 'clave';
+    const privateKey = "clave";
 
-    jwt.sign(payload, privateKey, { expiresIn: '1h' }, (error, token) => {
+    jwt.sign(payload, privateKey, { expiresIn: "1h" }, (error, token) => {
       if (error) {
         console.log(error);
         return res.status(500).json({
-          msg: 'Error al generar el token JWT',
+          msg: "Error al generar el token JWT",
         });
       }
 
       // Devuelve el token JWT en la respuesta
       res.json({
-        msg: 'Inicio de sesión exitoso',
+        msg: "Inicio de sesión exitoso",
         token,
         usuario: {
           id: usuario.id,
@@ -161,7 +182,7 @@ const loginUsuario = async (req, res = response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: 'Error en el inicio de sesión',
+      msg: "Error en el inicio de sesión",
     });
   }
 };
@@ -196,11 +217,27 @@ const usuariosDelete = async (req, res = response) => {
   }
 };
 
-
 const usuariosPatch = (req, res = response) => {
   res.json({
     msg: "patch API",
   });
+};
+
+const obtenerTopUsuarios = async (req, res) => {
+  try {
+    const topUsuarios = await Usuario.find({ deleted: false })
+      .sort({ lecciones_compt: -1, puntaje: -1, can_estrellas: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      topUsuarios,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al obtener los usuarios",
+    });
+  }
 };
 
 module.exports = {
@@ -211,4 +248,5 @@ module.exports = {
   usuariosDelete,
   usuariosPost,
   loginUsuario,
+  obtenerTopUsuarios,
 };

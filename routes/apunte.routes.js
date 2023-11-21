@@ -4,6 +4,7 @@ const {
   crearApunte,
   actualizarApunte,
   eliminarApunte,
+  obtenerApuntesPorUsuario,
 } = require("../controllers/apunte.controller.js");
 const { check } = require("express-validator");
 const { validarCampos } = require("../middlewares/validar-campos.js");
@@ -12,6 +13,8 @@ const { authMiddleware } = require("../middlewares/authMiddleware.js");
 const routerApuntes = Router();
 
 routerApuntes.get("/", obtenerApuntes);
+
+routerApuntes.get("/usuario/:idUsuario", [authMiddleware], obtenerApuntesPorUsuario);
 
 routerApuntes.post(
   "/",

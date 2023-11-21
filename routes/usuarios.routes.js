@@ -8,6 +8,7 @@ const {
   usuariosPatch,
   loginUsuario,
   obtenerUsuarioID,
+  obtenerTopUsuarios, // Import the new controller function
 } = require("../controllers/usuarios.controller");
 const { check } = require("express-validator");
 const { validarCampos } = require("../middlewares/validar-campos.js");
@@ -17,6 +18,11 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 const routerUsuario = Router();
 
 routerUsuario.get("/", usuariosGet);
+
+routerUsuario.get('/',obtenerUsuarioID)
+
+routerUsuario.get('/top', obtenerTopUsuarios); // New route to get top users
+
 
 routerUsuario.get('/:id',[
   check('id','El id no es valido').isMongoId(),
