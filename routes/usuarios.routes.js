@@ -19,6 +19,8 @@ const routerUsuario = Router();
 
 routerUsuario.get("/", usuariosGet);
 
+routerUsuario.get('/',obtenerUsuarioID)
+
 routerUsuario.get('/top', obtenerTopUsuarios); // New route to get top users
 
 
