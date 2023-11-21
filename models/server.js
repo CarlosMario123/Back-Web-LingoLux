@@ -15,6 +15,7 @@ class ServerApi {
     this.traductor = "/API/traductor";
     this.palabra = "/API/palabra"
     this.generador = '/API/generador'
+    this.recursoExterno = '/API/recursoExterno'
     //Conectar a base de datos
     this.conectarDB();
 
@@ -50,6 +51,7 @@ class ServerApi {
     this.app.use(this.traductor, require("../routes/traductor.routes"));
     this.app.use(this.palabra, require("../routes/palabra.routes"));
     this.app.use(this.generador, require("../routes/generador.routes"));
+    this.app.use(this.recursoExterno,require('../routes/recursosExternos.routes'))
   }
 
   listen() {
