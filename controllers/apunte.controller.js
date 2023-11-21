@@ -1,3 +1,4 @@
+const { request } = require("express");
 const Apunte = require("../modules/apunte");
 
 // Controlador para obtener todos los apuntes con paginación y ordenamiento
@@ -5,8 +6,8 @@ const obtenerApuntes = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const perPage = parseInt(req.query.perPage) || 10;
-    const sortBy = req.query.sortBy || 'createdAt';
-    const sortOrder = req.query.sortOrder || 'asc';
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder || "asc";
 
     const skip = (page - 1) * perPage;
 
@@ -28,7 +29,7 @@ const obtenerApuntes = async (req, res) => {
   }
 };
 
-// Controlador para crear un nuevo apunte 
+// Controlador para crear un nuevo apunte
 const crearApunte = async (req, res) => {
   const { titulo, contenido } = req.body;
 
@@ -52,13 +53,18 @@ const crearApunte = async (req, res) => {
   }
 };
 
-// Controlador para actualizar un apunte 
-const actualizarApunte = async (req, res) => {
+// Controlador para actualizar un apunte
+const actualizarApunte = async (req = request, res) => {
   const id = req.params.id;
+  const idUsuario = req.params.usuario;
   const { titulo, contenido } = req.body;
 
   try {
     const apunte = await Apunte.findById(id);
+
+    const idUsuario = req.params.usuario;
+
+    console.log(idUsuario);
 
     if (!apunte) {
       return res.status(404).json({
@@ -87,66 +93,89 @@ const actualizarApunte = async (req, res) => {
 
 // Controlador para eliminar lógicamente un apunte
 const eliminarApunteLogico = async (req, res) => {
-    const id = req.params.id;
-  
-    try {
-      const apunte = await Apunte.findById(id);
-  
-      if (!apunte) {
-        return res.status(404).json({
-          msg: "Apunte no encontrado",
-        });
-      }
-  
-      // Eliminación lógica
-      apunte.deleted = true;
-      apunte.deletedAt = new Date();
-      apunte.deletedBy = req.usuario.id; // Establece el usuario que realiza la eliminación lógica
-  
-      await apunte.save();
-  
-      return res.status(200).json({
-        msg: "Apunte eliminado lógicamente",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        msg: "Error al eliminar el apunte lógicamente",
+  const id = req.params.id;
+
+  try {
+    const apunte = await Apunte.findById(id);
+
+    if (!apunte) {
+      return res.status(404).json({
+        msg: "Apunte no encontrado",
       });
     }
-  };
-  
-  // Controlador para eliminar físicamente un apunte
-  const eliminarApunteFisico = async (req, res) => {
-    const id = req.params.id;
-  
-    try {
-      const apunte = await Apunte.findById(id);
-  
-      if (!apunte) {
-        return res.status(404).json({
-          msg: "Apunte no encontrado",
-        });
-      }
-  
-      // Eliminación física (borrado permanente)
-      await Apunte.deleteOne({ _id: id });
-  
-      return res.status(200).json({
-        msg: "Apunte eliminado físicamente",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        msg: "Error al eliminar el apunte físicamente",
+
+    // Eliminación lógica
+    apunte.deleted = true;
+    apunte.deletedAt = new Date();
+    apunte.deletedBy = req.usuario.id; // Establece el usuario que realiza la eliminación lógica
+
+    await apunte.save();
+
+    return res.status(200).json({
+      msg: "Apunte eliminado lógicamente",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al eliminar el apunte lógicamente",
+    });
+  }
+};
+
+// Controlador para eliminar físicamente un apunte
+const eliminarApunteFisico = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const apunte = await Apunte.findById(id);
+
+    if (!apunte) {
+      return res.status(404).json({
+        msg: "Apunte no encontrado",
       });
     }
-  };
-  
+
+    // Eliminación física (borrado permanente)
+    await Apunte.deleteOne({ _id: id });
+
+    return res.status(200).json({
+      msg: "Apunte eliminado físicamente",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al eliminar el apunte físicamente",
+    });
+  }
+};
+
+// ... (existing code)
+
+// Controlador para obtener apuntes por ID de usuario
+const obtenerApuntesPorUsuario = async (req, res) => {
+  const idUsuario = req.params.idUsuario;
+
+  try {
+    const apuntes = await Apunte.find({
+      createdBy: idUsuario,
+      deleted: false,
+    });
+
+    res.status(200).json({
+      apuntes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al obtener los apuntes del usuario",
+    });
+  }
+};
 
 module.exports = {
   obtenerApuntes,
   crearApunte,
   actualizarApunte,
-  eliminarApunte:eliminarApunteLogico,
+  eliminarApunte: eliminarApunteLogico,
+  obtenerApuntesPorUsuario,
 };
