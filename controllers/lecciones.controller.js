@@ -36,6 +36,61 @@ const obtenerLecciones = async (req, res) => {
   }
 };
 
+const leccionesDisponibles = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage) || 10;
+  const sortBy = req.query.sortBy || 'createdAt';
+  const sortOrder = req.query.sortOrder || 'asc';
+  const skip = (page - 1) * perPage;
+  const sortOption = { [sortBy]: sortOrder };
+
+  try {
+    const { estrellas } = req.params;
+    const lecciones = await Leccion.find({ requisito: { $lte: estrellas} })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(perPage);
+
+    return res.status(200).json({
+      lecciones
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: 'Error al cargar las lecciones',
+      error: error.msg
+    });
+  }
+};
+
+const leccionesBloqueadas = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage) || 10;
+  const sortBy = req.query.sortBy || 'createdAt';
+  const sortOrder = req.query.sortOrder || 'asc';
+  const skip = (page - 1) * perPage;
+  const sortOption = { [sortBy]: sortOrder };
+
+  try {
+    const lecciones = await Leccion.find({ requisito: { $gt: req.params.estrellas} })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(perPage);
+
+    return res.status(200).json({
+      lecciones
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: 'Error al cargar las lecciones',
+      error: error.msg
+    });
+  }
+};
+
 const consultarLeccion = async (req, res) => {
   try {
     const idLeccion = req.params.id;
@@ -68,9 +123,9 @@ const consultarLeccion = async (req, res) => {
 };
 
 const agregarLeccion = async (req, res) => {
-  const { titulo, temas, preguntas } = req.body;
+  const { titulo, temas, preguntas, requisito } = req.body;
   try {
-    const leccion = new Leccion({ titulo, temas, preguntas });
+    const leccion = new Leccion({ titulo, temas, preguntas, requisito });
     await leccion.save();
 
     return res.status(200).json({
@@ -135,6 +190,8 @@ const editarLeccion = async (req, res) => {
 
 module.exports = {
   obtenerLecciones,
+  leccionesDisponibles,
+  leccionesBloqueadas,
   consultarLeccion,
   agregarLeccion,
   eliminarLeccion,
