@@ -29,7 +29,7 @@ const obtenerPreguntas = async (req, res) => {
 const consultarPregunta = async (req, res) => {
     try {
         const idPregunta = req.params.id;
-        const pregunta = await Pregunta.findById(idPregunta).populate('leccion', { requisito: 1 });
+        const pregunta = await Pregunta.findById(idPregunta)
         const usuario = await Usuario.findById(req.usuario.id);
 
         if (!pregunta) {
@@ -37,11 +37,7 @@ const consultarPregunta = async (req, res) => {
                 message: 'Pregunta no encontrada'
             })
         }
-        if (usuario.can_estrellas < pregunta.leccion.requisito) {
-            return res.status(401).json({
-                message: 'Lección bloqueada'
-            })
-        }
+   
         return res.status(200).json({ pregunta });
 
     } catch (error) {
