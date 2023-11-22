@@ -4,6 +4,9 @@ const palabraSchema = Schema({
   imagen: {
     type: String,
   },
+  nombre:{
+    type: String
+  },
   palabraEsp: {
     type: String,
   },
@@ -11,7 +14,5 @@ const palabraSchema = Schema({
     type: String,
   },
 });
-
-
 
 module.exports = model("Palabra", palabraSchema);

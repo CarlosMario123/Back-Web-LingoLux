@@ -35,9 +35,9 @@ const palabrasGetById = async (req, res) => {
 };
 
 const palabrasPost = async (req, res) => {
-  const { imagen, palabraEsp,palabraIng } = req.body;
+  const { imagen, palabraEsp,palabraIng, nombre } = req.body;
   try {
-    const palabra = new Palabra({ imagen,palabraEsp,palabraIng});
+    const palabra = new Palabra({ imagen,nombre,palabraEsp,palabraIng});
     await palabra.save();
 
     return res.status(200).json({
@@ -78,8 +78,8 @@ const palanrasPut = async (req, res) => {
   const idPalabra = req.params.id;
 
   try {
-    const { imagen, palabraEsp,palabraIng } = req.body;
-    const palabra = await Palabra.findByIdAndUpdate(idPalabra, palabraEsp,palabraIng,imagen);
+    const { imagen, palabraEsp,palabraIng, nombre } = req.body;
+    const palabra = await Palabra.findByIdAndUpdate(idPalabra, palabraEsp,palabraIng,imagen,nombre);
 
     if (!palabra) {
       return res.status(404).json({

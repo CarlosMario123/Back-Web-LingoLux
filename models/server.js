@@ -16,6 +16,8 @@ class ServerApi {
     this.palabra = "/API/palabra"
     this.generador = '/API/generador'
     this.recursoExterno = '/API/recursoExterno'
+    this.memorama = '/API/memorama'
+    this.word = '/API/wordguess'
     //Conectar a base de datos
     this.conectarDB();
 
@@ -52,6 +54,8 @@ class ServerApi {
     this.app.use(this.palabra, require("../routes/palabra.routes"));
     this.app.use(this.generador, require("../routes/generador.routes"));
     this.app.use(this.recursoExterno,require('../routes/recursosExternos.routes'))
+    this.app.use(this.memorama,require('../routes/memorama.routes'))
+    this.app.use(this.word,require('../routes/wordguess.routes'))
   }
 
   listen() {
