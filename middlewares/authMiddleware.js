@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const secretKey = 'clave';
 
 const authMiddleware = (req, res, next) => {
-  const token = req.header('x-token'); // Puedes ajustar el encabezado según tu configuración
+  const token = req.header('Authorization'); // Puedes ajustar el encabezado según tu configuración
 
   if (!token) {
     return res.status(401).json({ msg: 'Token no válido, autorización denegada' });
