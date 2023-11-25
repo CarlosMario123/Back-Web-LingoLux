@@ -25,64 +25,64 @@ PUT:http://localhost:3000/API/usuarios/:ID
 POST:http://localhost:3000/API/usuarios
 
 -Apuntes:
-GET:http://localhost:3000/API/apuntes/
-POST:http://localhost:3000/API/apuntes/
-DELETE:http://localhost:3000/API/apuntes/:ID
-PUT:http://localhost:3000/API/apuntes/:ID
+  GET:http://localhost:3000/API/apuntes/
+  POST:http://localhost:3000/API/apuntes/
+  DELETE:http://localhost:3000/API/apuntes/:ID
+  PUT:http://localhost:3000/API/apuntes/:ID
 
 -Libros de vocabulario:
-GET:http://localhost:3000/API/libroVocabulario
-POST:http://localhost:3000/API/libroVocabulario
-DELETE:http://localhost:3000/API/libroVocabulario/:ID
-PUT:http://localhost:3000/API/libroVocabulario/:ID
+  GET:http://localhost:3000/API/libroVocabulario
+  POST:http://localhost:3000/API/libroVocabulario
+  DELETE:http://localhost:3000/API/libroVocabulario/:ID
+  PUT:http://localhost:3000/API/libroVocabulario/:ID
 
 -Libros de historias:
-GET:http://localhost:3000/API/libroHistorias/
-POST:http://localhost:3000/API/libroHistorias/
-DELETE:http://localhost:3000/API/libroHistorias/:ID
-PUT:http://localhost:3000/API/libroHistorias/:ID
+  GET:http://localhost:3000/API/libroHistorias/
+  POST:http://localhost:3000/API/libroHistorias/
+  DELETE:http://localhost:3000/API/libroHistorias/:ID
+  PUT:http://localhost:3000/API/libroHistorias/:ID
 
 -Lecciones:
-GET:http://localhost:3000/API/lecciones/
-POST:http://localhost:3000/API/lecciones/
-DELETE:http://localhost:3000/API/lecciones/:ID
-PUT:http://localhost:3000/API/lecciones/:ID
+  GET:http://localhost:3000/API/lecciones/
+  POST:http://localhost:3000/API/lecciones/
+  DELETE:http://localhost:3000/API/lecciones/:ID
+  PUT:http://localhost:3000/API/lecciones/:ID
 
 -Temas:
-GET:http://localhost:3000/API/temas/
-POST:http://localhost:3000/API/temas/
-DELETE:http://localhost:3000/API/temas/:ID
-PUT:http://localhost:3000/API/temas/:ID
+  GET:http://localhost:3000/API/temas/
+  POST:http://localhost:3000/API/temas/
+  DELETE:http://localhost:3000/API/temas/:ID
+  PUT:http://localhost:3000/API/temas/:ID
 
 -Preguntas:
-GET:http://localhost:3000/API/preguntas/
-POST:http://localhost:3000/API/preguntas/
-DELETE:http://localhost:3000/API/preguntas/:ID
-PUT:http://localhost:3000/API/preguntas/:ID
+  GET:http://localhost:3000/API/preguntas/
+  POST:http://localhost:3000/API/preguntas/
+  DELETE:http://localhost:3000/API/preguntas/:ID
+  PUT:http://localhost:3000/API/preguntas/:ID
 
 -Palabra:
-GET:http://localhost:3000/API/palabra/
-POST:http://localhost:3000/API/palabra/
-DELETE:http://localhost:3000/API/palabra/:ID
-PUT:http://localhost:3000/API/palabra/:ID
+  GET:http://localhost:3000/API/palabra/
+  POST:http://localhost:3000/API/palabra/
+  DELETE:http://localhost:3000/API/palabra/:ID
+  PUT:http://localhost:3000/API/palabra/:ID
 
 -Generador:
-GET:http://localhost:3000/API/generador/
-POST:http://localhost:3000/API/generador/
-DELETE:http://localhost:3000/API/generador/:ID
-PUT:http://localhost:3000/API/generador/:ID
+  GET:http://localhost:3000/API/generador/
+  POST:http://localhost:3000/API/generador/
+  DELETE:http://localhost:3000/API/generador/:ID
+  PUT:http://localhost:3000/API/generador/:ID
 
 -Recursos externos:
-GET:http://localhost:3000/API/recursoExterno
-POST:http://localhost:3000/API/recursoExterno
-DELETE:http://localhost:3000/API/recursoExterno/:ID
-PUT:http://localhost:3000/API/recursoExterno/:ID
+  GET:http://localhost:3000/API/recursoExterno
+  POST:http://localhost:3000/API/recursoExterno
+  DELETE:http://localhost:3000/API/recursoExterno/:ID
+  PUT:http://localhost:3000/API/recursoExterno/:ID
 
 -Memorama:
-GET:http://localhost:3000/API/memorama
-POST:http://localhost:3000/API/memorama
-DELETE:http://localhost:3000/API/memorama:ID
-PUT:http://localhost:3000/API/memorama:ID
+  GET:http://localhost:3000/API/memorama
+  POST:http://localhost:3000/API/memorama
+  DELETE:http://localhost:3000/API/memorama:ID
+  PUT:http://localhost:3000/API/memorama:ID
 
 # Contribuciones
 
