@@ -15,17 +15,28 @@ Inicia el servidor de desarrollo:
 
     npm start
 
+# Dependencias 
+
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.6.3",
+    "nodemon": "^3.0.1"
+
 # EndPoints
 
 -usuarios
-Login: http://localhost:3000/API/usuarios/login
-GET: http://localhost:3000/API/usuarios
-DELETE:http://localhost:3000/API/usuarios/:ID
-PUT:http://localhost:3000/API/usuarios/:ID
-POST:http://localhost:3000/API/usuarios
+  Login: http://localhost:3000/API/usuarios/login
+  GET: http://localhost:3000/API/usuarios
+  DELETE:http://localhost:3000/API/usuarios/:ID
+  PUT:http://localhost:3000/API/usuarios/:ID
+  POST:http://localhost:3000/API/usuarios
 
--Apuntes:
-  GET:http://localhost:3000/API/apuntes/
+-Apuntes: 
+  GET: http://localhost:3000/API/apuntes/
   POST:http://localhost:3000/API/apuntes/
   DELETE:http://localhost:3000/API/apuntes/:ID
   PUT:http://localhost:3000/API/apuntes/:ID
