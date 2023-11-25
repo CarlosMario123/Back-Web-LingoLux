@@ -19,7 +19,6 @@ bash
 
 npm install
 
-Nota: Utiliza el código con precaución. Más información aquí.
 
 Inicia el servidor de desarrollo:
 
