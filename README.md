@@ -8,7 +8,7 @@ Instalación
 
 Instala las dependencias:
 
-   npm install
+    npm install
 
 
 Inicia el servidor de desarrollo:
