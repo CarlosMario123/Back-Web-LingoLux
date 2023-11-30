@@ -1,4 +1,4 @@
-const ServerAPI = require('./models/server.js')
+const ServerAPI = require('./server/server')
 
 const serverAPI = new ServerAPI();
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const dbConnection = async () => {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/lingoLuxBDD', {
+    await mongoose.connect('mongodb://localhost:27017/lingoLuxDB', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
