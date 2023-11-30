@@ -17,7 +17,6 @@ const seedPreguntas = async () => {
     const preguntasEjemplo = [
       {
         nombre: "Pregunta 1",
-        num_pregunta: 1,
         opciones: ["Opción A", "Opción B", "Opción C", "Opción D"],
         opcionCorrecta: "Opción B",
         leccion: leccionEjemplo._id,
@@ -25,7 +24,6 @@ const seedPreguntas = async () => {
       },
       {
         nombre: "Pregunta 2",
-        num_pregunta: 2,
         opciones: ["Opción X", "Opción Y", "Opción Z"],
         opcionCorrecta: "Opción Z",
         leccion: leccionEjemplo._id,

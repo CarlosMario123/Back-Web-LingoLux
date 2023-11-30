@@ -1,14 +1,42 @@
 const Palabra = require("../modules/palabra");
 
-const palbrasGet = async (req, res) => {
+const palabrasGet = async (req, res) => {
   try {
-    const palabras = await Palabra.find();
-    return res.status(200).json({ palabras });
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 10;
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder || "asc";
+
+    const skip = (page - 1) * perPage;
+
+    const sortOption = { [sortBy]: sortOrder };
+
+    const palabras = await Palabra.find({ deleted: false })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(perPage);
+
+    let response = {
+      message: 'palabras obtenidas exitosamente',
+      palabras
+    }
+
+    if (page && perPage) {
+      const total = await Palabra.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
+    return res.status(200).json({ response });
 
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      msg: 'Error al cargar los palabras',
+      msg: 'Error al cargar las palabras',
       error: error.msg
     });
   }
@@ -21,23 +49,23 @@ const palabrasGetById = async (req, res) => {
 
     if (!palabra) {
       return res.status(404).json({
-        message: 'palabra no encontrado'
+        message: 'palabra no encontrada'
       })
     }
-    return res.json({ palabra });
+    return res.status(200).json({ palabra });
 
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      msg: 'Error al consultar el palabra',
+      msg: 'Error al consultar la palabra',
     });
   }
 };
 
 const palabrasPost = async (req, res) => {
-  const { imagen, palabraEsp,palabraIng, nombre } = req.body;
+  const { imagen, palabraEsp, palabraIng } = req.body;
   try {
-    const palabra = new Palabra({ imagen,nombre,palabraEsp,palabraIng});
+    const palabra = new Palabra({ imagen, palabraEsp, palabraIng, createdBy: req.usuario.id });
     await palabra.save();
 
     return res.status(200).json({
@@ -45,9 +73,9 @@ const palabrasPost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return res.status(500).json({
-      msg: 'Error al agregar el palabra',
+      msg: 'Error al agregar la palabra',
     });
   }
 };
@@ -55,46 +83,22 @@ const palabrasPost = async (req, res) => {
 const palabrasDelete = async (req, res) => {
   const idPalabra = req.params.id;
   try {
-    const palabra = await Palabra.findByIdAndDelete(idPalabra);
+    const palabra = await Palabra.findByIdAndUpdate(idPalabra,
+      { deleted: true, deletedAt: new Date(), deletedBy: req.usuario.id });
 
     if (!palabra) {
       return res.status(404).json({
-        msg: "palabra no encontrado",
+        msg: "palabra no encontrada",
       });
     }
     return res.status(200).json({
-      msg: "palabra eliminado correctamente",
+      msg: "palabra eliminada correctamente",
     });
 
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      msg: "Error al eliminar el palabra",
-    });
-  }
-};
-
-const palanrasPut = async (req, res) => {
-  const idPalabra = req.params.id;
-
-  try {
-    const { imagen, palabraEsp,palabraIng, nombre } = req.body;
-    const palabra = await Palabra.findByIdAndUpdate(idPalabra, palabraEsp,palabraIng,imagen,nombre);
-
-    if (!palabra) {
-      return res.status(404).json({
-        msg: "palabra no encontrado",
-      });
-    }
-
-    return res.status(200).json({
-      msg: "palabra actualizado correctamente"
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      msg: "Error al actualizar el palabra",
+      msg: "Error al eliminar la palabra",
     });
   }
 };
@@ -103,33 +107,32 @@ const palabrasPatch = async (req, res) => {
   const idPalabra = req.params.id;
 
   try {
-    const { imagen, palabraEsp,palabraIng } = req.body;
-    const datosEditar = { palabraEsp, palabraIng, imagen };
+    const { imagen, palabraEsp, palabraIng } = req.body;
+    const datosEditar = { imagen, palabraEsp, palabraIng, updatedAt: new Date(), updatedBy: req.usuario.id };
     const palabra = await Palabra.findByIdAndUpdate(idPalabra, datosEditar);
 
     if (!palabra) {
       return res.status(404).json({
-        msg: "palabra no encontrado",
+        msg: "palabra no encontrada",
       });
     }
 
     return res.status(200).json({
-      msg: "palabra actualizado correctamente"
+      msg: "palabra actualizada correctamente"
     });
 
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: "Error al actualizar el palabra",
+      msg: "Error al actualizar la palabra",
     });
   }
 };
 
 module.exports = {
-  palbrasGet,
+  palabrasGet,
   palabrasGetById,
   palabrasPost,
-  palanrasPut,
   palabrasPatch,
   palabrasDelete,
 };

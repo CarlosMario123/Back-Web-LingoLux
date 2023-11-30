@@ -17,14 +17,29 @@ const obtenerLecciones = async (req, res) => {
     completados: usuario.lecciones_compt,
   }
   try {
-    const lecciones = await Leccion.find()
+    const lecciones = await Leccion.find({ deleted: false })
       .sort(sortOption)
       .skip(skip)
       .limit(perPage);
 
+    let response = {
+      message: 'lecciones obtenidas exitosamente',
+      lecciones
+    }
+
+    if (page && perPage) {
+      const total = await Leccion.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
     return res.status(200).json({
       usuarioAuth,
-      lecciones
+      response
     });
 
   } catch (error) {
@@ -46,7 +61,7 @@ const leccionesDisponibles = async (req, res) => {
 
   try {
     const { estrellas } = req.params;
-    const lecciones = await Leccion.find({ requisito: { $lte: estrellas} })
+    const lecciones = await Leccion.find({ requisito: { $lte: estrellas } })
       .sort(sortOption)
       .skip(skip)
       .limit(perPage);
@@ -73,7 +88,7 @@ const leccionesBloqueadas = async (req, res) => {
   const sortOption = { [sortBy]: sortOrder };
 
   try {
-    const lecciones = await Leccion.find({ requisito: { $gt: req.params.estrellas} })
+    const lecciones = await Leccion.find({ requisito: { $gt: req.params.estrellas } })
       .sort(sortOption)
       .skip(skip)
       .limit(perPage);
@@ -95,24 +110,17 @@ const consultarLeccion = async (req, res) => {
   try {
     const idLeccion = req.params.id;
     const leccion = await Leccion.findById(idLeccion);
-    const usuario = await Usuario.findById(req.usuario.id);
 
     if (!leccion) {
       return res.status(404).json({
         message: 'Lección no localizada',
       })
     }
-    if (usuario.can_estrellas < leccion.requisito) {
-      return res.status(401).json({
-        message: 'Lección bloqueada',
-      })
-    } else {
-      return res.status(200).json({
-        idUsuario: req.usuario.id,
-        usuario: req.usuario.nombre,
-        leccion
-      });
-    }
+    return res.status(200).json({
+      idUsuario: req.usuario.id,
+      usuario: req.usuario.nombre,
+      leccion
+    });
 
   } catch (error) {
     console.error(error);
@@ -125,7 +133,7 @@ const consultarLeccion = async (req, res) => {
 const agregarLeccion = async (req, res) => {
   const { titulo, temas, preguntas, requisito } = req.body;
   try {
-    const leccion = new Leccion({ titulo, temas, preguntas, requisito });
+    const leccion = new Leccion({ titulo, temas, preguntas, requisito, createdBy: req.usuario.id });
     await leccion.save();
 
     return res.status(200).json({
@@ -140,7 +148,30 @@ const agregarLeccion = async (req, res) => {
   }
 };
 
-const eliminarLeccion = async (req, res) => {
+const eliminarLeccionLog = async (req, res) => {
+  const idLeccion = req.params.id;
+  try {
+    const leccion = await Leccion.findByIdAndUpdate(idLeccion,
+      { deleted: true, deletedAt: new Date(), deletedBy: req.usuario.id });
+
+    if (!leccion) {
+      return res.status(404).json({
+        msg: "Lección no localizada",
+      });
+    }
+    return res.status(200).json({
+      msg: "Lección eliminada correctamente",
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      msg: "Error al eliminar la lección",
+    });
+  }
+};
+
+const eliminarLeccionFis = async (req, res) => {
   const idLeccion = req.params.id;
   try {
     const leccion = await Leccion.findByIdAndDelete(idLeccion);
@@ -167,7 +198,7 @@ const editarLeccion = async (req, res) => {
 
   try {
     const { titulo, temas, preguntas } = req.body;
-    const datosEditar = { titulo, temas, preguntas, updatedAt: new Date() };
+    const datosEditar = { titulo, temas, preguntas, updatedAt: new Date(), updatedBy: req.usuario.id };
     const leccion = await Leccion.findByIdAndUpdate(idLeccion, datosEditar);
 
     if (!leccion) {
@@ -194,6 +225,6 @@ module.exports = {
   leccionesBloqueadas,
   consultarLeccion,
   agregarLeccion,
-  eliminarLeccion,
+  eliminarLeccion: eliminarLeccionLog,
   editarLeccion,
 };

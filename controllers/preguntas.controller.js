@@ -11,11 +11,26 @@ const obtenerPreguntas = async (req, res) => {
     const sortOption = { [sortBy]: sortOrder };
 
     try {
-        const preguntas = await Pregunta.find()
+        const preguntas = await Pregunta.find({ deleted: false })
             .sort(sortOption)
             .skip(skip)
             .limit(perPage);
-        return res.status(200).json({ preguntas });
+
+        let response = {
+            message: 'preguntas obtenidas exitosamente',
+            preguntas
+        }
+
+        if (page && perPage) {
+            const total = await Pregunta.countDocuments({ deleted: false });
+            const totalPages = Math.ceil(total / perPage);
+            const currentPage = parseInt(page);
+
+            response = {
+                ...response, total, totalPages, currentPage
+            }
+        }
+        return res.status(200).json({ response });
 
     } catch (error) {
         console.error(error);
@@ -30,16 +45,10 @@ const consultarPregunta = async (req, res) => {
     try {
         const idPregunta = req.params.id;
         const pregunta = await Pregunta.findById(idPregunta).populate('leccion', { requisito: 1 });
-        const usuario = await Usuario.findById(req.usuario.id);
 
         if (!pregunta) {
             return res.status(404).json({
                 message: 'Pregunta no encontrada'
-            })
-        }
-        if (usuario.can_estrellas < pregunta.leccion.requisito) {
-            return res.status(401).json({
-                message: 'Lección bloqueada'
             })
         }
         return res.status(200).json({ pregunta });
@@ -55,7 +64,7 @@ const consultarPregunta = async (req, res) => {
 const agregarPregunta = async (req, res) => {
     const { nombre, opciones, opcionCorrecta, leccion } = req.body;
     try {
-        const pregunta = new Pregunta({ nombre, opciones, opcionCorrecta, leccion });
+        const pregunta = new Pregunta({ nombre, opciones, opcionCorrecta, leccion, createdBy: req.usuario.id });
         await pregunta.save();
 
         return res.status(200).json({
@@ -70,7 +79,30 @@ const agregarPregunta = async (req, res) => {
     }
 };
 
-const eliminarPregunta = async (req, res) => {
+const eliminarPreguntaLog = async (req, res) => {
+    const idPregunta = req.params.id;
+    try {
+        const pregunta = await Pregunta.findByIdAndUpdate(idPregunta,
+            { deleted: true, deletedAt: new Date(), deletedBy: req.usuario.id });
+
+        if (!pregunta) {
+            return res.status(404).json({
+                msg: "Pregunta no localizada",
+            });
+        }
+        return res.status(200).json({
+            msg: "Pregunta eliminada correctamente",
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            msg: "Error al eliminar la pregunta",
+        });
+    }
+};
+
+const eliminarPreguntaFis = async (req, res) => {
     const idPregunta = req.params.id;
     try {
         const pregunta = await Pregunta.findByIdAndDelete(idPregunta);
@@ -97,7 +129,7 @@ const editarPregunta = async (req, res) => {
 
     try {
         const { nombre, opciones, opcionCorrecta, leccion } = req.body;
-        const datosEditar = { nombre, opciones, opcionCorrecta, leccion, updateAt: new Date() };
+        const datosEditar = { nombre, opciones, opcionCorrecta, leccion, updatedAt: new Date(), updatedBy: req.usuario.id };
         const pregunta = await Pregunta.findByIdAndUpdate(idPregunta, datosEditar);
 
         if (!pregunta) {
@@ -175,7 +207,7 @@ module.exports = {
     obtenerPreguntas,
     consultarPregunta,
     agregarPregunta,
-    eliminarPregunta,
+    eliminarPregunta: eliminarPreguntaLog,
     editarPregunta,
     respuestaCorrecta
 };

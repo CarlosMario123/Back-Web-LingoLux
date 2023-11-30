@@ -4,9 +4,37 @@ const LibroHistorias = require("../modules/librosHistoria");
 // Controlador para obtener todos los libros de vocabulario
 const obtenerLibros = async (req, res) => {
   try {
-    const libros = await LibroHistorias.find({ deleted: false });
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 10;
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder || "asc";
+
+    const skip = (page - 1) * perPage;
+
+    const sortOption = { [sortBy]: sortOrder };
+
+    const libros = await LibroHistorias.find({ deleted: false })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(perPage);
+
+    let response = {
+      message: 'libros obtenidos exitosamente',
+      libros
+    }
+
+    if (page && perPage) {
+      const total = await LibroHistorias.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
     res.status(200).json({
-      libros,
+      response
     });
   } catch (error) {
     console.error(error);
@@ -16,7 +44,7 @@ const obtenerLibros = async (req, res) => {
   }
 };
 
-const obtenerLibro = async(req = request, res = response)=>{
+const obtenerLibro = async (req = request, res = response) => {
   const id = req.params.id;
 
   console.log(id);
@@ -151,6 +179,6 @@ module.exports = {
   obtenerLibros,
   crearLibro,
   actualizarLibro,
-  eliminarLibro:eliminarLibroLog,
+  eliminarLibro: eliminarLibroLog,
   obtenerLibro
 };

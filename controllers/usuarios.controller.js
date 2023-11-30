@@ -19,8 +19,23 @@ const usuariosGet = async (req = request, res = response) => {
       .skip(skip)
       .limit(perPage);
 
+    let response = {
+      message: 'usuarios obtenidos exitosamente',
+      usuarios
+    }
+
+    if (page && perPage) {
+      const total = await Usuario.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
     res.json({
-      usuarios,
+      response,
     });
   } catch (error) {
     console.error(error);

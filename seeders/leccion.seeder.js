@@ -11,17 +11,11 @@ const seedLecciones = async () => {
     const leccionesEjemplo = [
       {
         titulo: "Lección 1",
-        num_leccion: 1,
-        temas: [/* ID de temas relacionados */],
-        preguntas: [/* ID de preguntas relacionadas */],
         requisito: 0,
         createdBy: "Usuario1",
       },
       {
         titulo: "Lección 2",
-        num_leccion: 2,
-        temas: [/* ID de temas relacionados */],
-        preguntas: [/* ID de preguntas relacionadas */],
         requisito: 1,
         createdBy: "Usuario2",
       },

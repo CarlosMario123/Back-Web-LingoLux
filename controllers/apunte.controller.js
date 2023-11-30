@@ -18,8 +18,23 @@ const obtenerApuntes = async (req, res) => {
       .skip(skip)
       .limit(perPage);
 
+    let response = {
+      message: 'apuntes obtenidos exitosamente',
+      apuntes
+    }
+
+    if (page && perPage) {
+      const total = await Apunte.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
     res.status(200).json({
-      apuntes,
+      response
     });
   } catch (error) {
     console.error(error);
@@ -43,6 +58,7 @@ const crearApunte = async (req, res) => {
     await nuevoApunte.save();
 
     res.status(201).json({
+      msg: 'Apunte nuevo creado',
       apunte: nuevoApunte,
     });
   } catch (error) {

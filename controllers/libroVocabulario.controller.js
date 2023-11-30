@@ -17,8 +17,23 @@ const obtenerLibros = async (req, res) => {
       .skip(skip)
       .limit(perPage);
 
+    let response = {
+      message: 'libros obtenidos exitosamente',
+      libros
+    }
+
+    if (page && perPage) {
+      const total = await LibroVocabulario.countDocuments({ deleted: false });
+      const totalPages = Math.ceil(total / perPage);
+      const currentPage = parseInt(page);
+
+      response = {
+        ...response, total, totalPages, currentPage
+      }
+    }
+
     res.status(200).json({
-      libros,
+      response
     });
   } catch (error) {
     console.error(error);

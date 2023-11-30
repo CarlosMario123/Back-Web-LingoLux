@@ -4,9 +4,6 @@ const preguntaSchema = Schema({
   nombre: {
     type: String
   },
-  num_pregunta: {
-    type: Number
-  },
   opciones: {
     type: [String]
   },

@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const {
   obtenerRecursosExternos,
+  obtenerRecursoExterno,
   crearRecursoExterno,
   actualizarRecursoExterno,
   eliminarRecursoExterno,
@@ -12,6 +13,8 @@ const { authMiddleware } = require("../middlewares/authMiddleware.js");
 const routerRecursosExternos = Router();
 
 routerRecursosExternos.get("/", obtenerRecursosExternos);
+
+routerRecursosExternos.get("/:id", obtenerRecursoExterno);
 
 routerRecursosExternos.post(
   "/",
