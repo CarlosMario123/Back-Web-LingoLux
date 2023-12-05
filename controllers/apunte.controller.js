@@ -1,8 +1,12 @@
 const { request } = require("express");
 const Apunte = require("../modules/apunte");
+const mongoose = require('mongoose');
 
 // Controlador para obtener todos los apuntes con paginación y ordenamiento
 const obtenerApuntes = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const page = parseInt(req.query.page) || 1;
     const perPage = parseInt(req.query.perPage) || 10;
@@ -16,12 +20,19 @@ const obtenerApuntes = async (req, res) => {
     const apuntes = await Apunte.find({ deleted: false })
       .sort(sortOption)
       .skip(skip)
-      .limit(perPage);
+      .limit(perPage)
+      .session(session);
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json({
       apuntes,
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     console.error(error);
     res.status(500).json({
       msg: "Error al obtener los apuntes",
@@ -31,6 +42,9 @@ const obtenerApuntes = async (req, res) => {
 
 // Controlador para crear un nuevo apunte
 const crearApunte = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   const { titulo, contenido } = req.body;
 
   try {
@@ -40,15 +54,129 @@ const crearApunte = async (req, res) => {
       createdBy: req.usuario.id, // Establece el usuario creador
     });
 
-    await nuevoApunte.save();
+    await nuevoApunte.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(201).json({
       apunte: nuevoApunte,
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     console.error(error);
     res.status(500).json({
       msg: "Error al crear el apunte",
+    });
+  }
+};
+
+// Controlador para actualizar un apunte
+const actualizarApunte = async (req = request, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  const id = req.params.id;
+
+  try {
+    const apunte = await Apunte.findById(id).session(session);
+
+    if (!apunte) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        msg: "Apunte no encontrado",
+      });
+    }
+
+    const { titulo, contenido } = req.body;
+
+    apunte.titulo = titulo;
+    apunte.contenido = contenido;
+    apunte.updatedAt = new Date();
+    apunte.updatedBy = req.usuario.id; // Establece el usuario que realiza la actualización
+
+    await apunte.save();
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      msg: "Apunte actualizado correctamente",
+      apunte,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al actualizar el apunte",
+    });
+  }
+};
+
+// Controlador para eliminar lógicamente un apunte
+const eliminarApunteLogico = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  const id = req.params.id;
+
+  try {
+    const apunte = await Apunte.findById(id).session(session);
+
+    if (!apunte) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        msg: "Apunte no encontrado",
+      });
+    }
+
+    // Eliminación lógica
+    apunte.deleted = true;
+    apunte.deletedAt = new Date();
+    apunte.deletedBy = req.usuario.id; // Establece el usuario que realiza la eliminación lógica
+
+    await apunte.save();
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      msg: "Apunte eliminado lógicamente",
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al eliminar el apunte lógicamente",
+    });
+  }
+};
+
+// Controlador para obtener apuntes por ID de usuario
+const obtenerApuntesPorUsuario = async (req, res) => {
+  const idUsuario = req.params.idUsuario;
+
+  try {
+    const apuntes = await Apunte.find({
+      createdBy: idUsuario,
+      deleted: false,
+    });
+
+    res.status(200).json({
+      apuntes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al obtener los apuntes del usuario",
     });
   }
 };
@@ -89,124 +217,6 @@ const actualizarApuntePorUsuario = async (req, res) => {
   }
 }
 
-// Controlador para actualizar un apunte
-const actualizarApunte = async (req = request, res) => {
-  const id = req.params.id;
-  const idUsuario = req.params.usuario;
-  const { titulo, contenido } = req.body;
-
-  try {
-    const apunte = await Apunte.findById(id);
-
-    const idUsuario = req.params.usuario;
-
-    console.log(idUsuario);
-
-    if (!apunte) {
-      return res.status(404).json({
-        msg: "Apunte no encontrado",
-      });
-    }
-
-    apunte.titulo = titulo;
-    apunte.contenido = contenido;
-    apunte.updatedAt = new Date();
-    apunte.updatedBy = req.usuario.id; // Establece el usuario que realiza la actualización
-
-    await apunte.save();
-
-    res.status(200).json({
-      msg: "Apunte actualizado correctamente",
-      apunte,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al actualizar el apunte",
-    });
-  }
-};
-
-// Controlador para eliminar lógicamente un apunte
-const eliminarApunteLogico = async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const apunte = await Apunte.findById(id);
-
-    if (!apunte) {
-      return res.status(404).json({
-        msg: "Apunte no encontrado",
-      });
-    }
-
-    // Eliminación lógica
-    apunte.deleted = true;
-    apunte.deletedAt = new Date();
-    apunte.deletedBy = req.usuario.id; // Establece el usuario que realiza la eliminación lógica
-
-    await apunte.save();
-
-    return res.status(200).json({
-      msg: "Apunte eliminado lógicamente",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al eliminar el apunte lógicamente",
-    });
-  }
-};
-
-// Controlador para eliminar físicamente un apunte
-const eliminarApunteFisico = async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const apunte = await Apunte.findById(id);
-
-    if (!apunte) {
-      return res.status(404).json({
-        msg: "Apunte no encontrado",
-      });
-    }
-
-    // Eliminación física (borrado permanente)
-    await Apunte.deleteOne({ _id: id });
-
-    return res.status(200).json({
-      msg: "Apunte eliminado físicamente",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al eliminar el apunte físicamente",
-    });
-  }
-};
-
-// ... (existing code)
-
-// Controlador para obtener apuntes por ID de usuario
-const obtenerApuntesPorUsuario = async (req, res) => {
-  const idUsuario = req.params.idUsuario;
-
-  try {
-    const apuntes = await Apunte.find({
-      createdBy: idUsuario,
-      deleted: false,
-    });
-
-    res.status(200).json({
-      apuntes,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error al obtener los apuntes del usuario",
-    });
-  }
-};
 
 module.exports = {
   obtenerApuntes,

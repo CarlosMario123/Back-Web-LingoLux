@@ -130,6 +130,61 @@ const usuariosPost = async (req, res = response) => {
   console.log(usuario);
 };
 
+const mongoose = require("mongoose");
+const { startSession } = require("mongoose");
+
+const usuariosPostTrigger = async (req, res = response) => {
+  const session = await startSession();
+  session.startTransaction();
+
+  try {
+    const {
+      nombre,
+      correo,
+      password,
+      etapas,
+      can_estrellas,
+      nivel,
+      puntaje,
+      cuestionarios_compt,
+      lecciones_compt,
+    } = req.body;
+
+    const usuario = new Usuario({
+      nombre,
+      correo,
+      password,
+      etapas,
+      can_estrellas,
+      nivel,
+      puntaje,
+      cuestionarios_compt,
+      lecciones_compt,
+    });
+
+    const salt = bcryptjs.genSaltSync(10);
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    await usuario.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      usuario,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(error);
+    res.status(500).json({
+      msg: "Error al guardar el usuario",
+    });
+  }
+};
+
+
 const loginUsuario = async (req, res = response) => {
   const { correo, password } = req.body;
 
@@ -162,7 +217,7 @@ const loginUsuario = async (req, res = response) => {
     // Clave secreta para firmar el token
     const privateKey = "clave";
 
-    jwt.sign(payload, privateKey, { expiresIn: '365d' }, (error, token) => {
+    jwt.sign(payload, privateKey, { expiresIn: "1h" }, (error, token) => {
       if (error) {
         console.log(error);
         return res.status(500).json({
@@ -246,7 +301,7 @@ module.exports = {
   usuariosPut,
   usuariosPatch,
   usuariosDelete,
-  usuariosPost,
+  agregarUsuario: usuariosPostTrigger,
   loginUsuario,
   obtenerTopUsuarios,
 };

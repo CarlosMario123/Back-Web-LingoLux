@@ -3,12 +3,12 @@ const { Router } = require("express");
 const {
   usuariosGet,
   usuariosPut,
-  usuariosPost,
   usuariosDelete,
   usuariosPatch,
   loginUsuario,
   obtenerUsuarioID,
-  obtenerTopUsuarios, // Import the new controller function
+  obtenerTopUsuarios,
+  agregarUsuario, // Import the new controller function
 } = require("../controllers/usuarios.controller");
 const { check } = require("express-validator");
 const { validarCampos } = require("../middlewares/validar-campos.js");
@@ -44,7 +44,7 @@ routerUsuario.post(
     check("correo").custom(existeEmial),
     validarCampos,
   ],
-  usuariosPost
+  agregarUsuario
 );
 
 routerUsuario.post("/login", [validarCampos], loginUsuario);
