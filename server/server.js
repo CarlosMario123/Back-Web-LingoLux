@@ -4,7 +4,7 @@ const { dbConnection } = require("../database/configDB");
 class ServerApi {
   constructor() {
     this.app = express();
-    this.port = process.env.PORT || 3000;
+    this.port = 10000 || 3000;
     this.usuariosRoutes = "/API/usuarios";
     this.libroVocRoutes = "/API/libroVocabulario";
     this.libroHisRoutes = "/API/libroHistorias";
