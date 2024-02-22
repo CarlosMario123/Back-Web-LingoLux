@@ -31,14 +31,15 @@ const usuariosGet = async (req = request, res = response) => {
 };
 
 const obtenerUsuarioID = async (req = request, res = response) => {
+
   try {
-    const id = req.params.id;
+    const {id} = req.params;
     if (!id) {
       return res
         .status(404)
         .json({ msg: `EL usuario con el id ${id} no existe` });
     }
-    const usuario = await Usuario.findById({ id });
+    const usuario = await Usuario.findById( id );
 
     res.json({
       msg: "usuario encontrado",
@@ -54,31 +55,27 @@ const obtenerUsuarioID = async (req = request, res = response) => {
 
 const usuariosPut = async (req, res = response) => {
   const id = req.params.id;
-  const { nombre, correo, password, rol } = req.body;
+  const { nombre, correo, can_estrellas, puntaje, lecciones_compt } = req.body;
 
   try {
     // Verificar si el usuario con el ID proporcionado existe
-    const usuario = await Usuario.findById(id);
+    const usuario = await Usuario.findByIdAndUpdate(
+      id,
+      {
+        nombre,
+        correo,
+        can_estrellas,
+        puntaje,
+        lecciones_compt,
+      },
+      { new: true }
+    );
 
     if (!usuario) {
       return res.status(404).json({
         msg: "Usuario no encontrado",
       });
     }
-
-    // Actualiza los campos del usuario con los valores proporcionados
-    usuario.nombre = nombre;
-    usuario.correo = correo;
-    usuario.rol = rol;
-
-    // Encripta y actualiza la contraseña
-    if (password) {
-      const salt = bcryptjs.genSaltSync();
-      usuario.password = bcryptjs.hashSync(password, salt);
-    }
-
-    // Guarda los cambios en la base de datos
-    await usuario.save();
 
     res.json({
       msg: "Usuario actualizado correctamente",
@@ -184,7 +181,6 @@ const usuariosPostTrigger = async (req, res = response) => {
   }
 };
 
-
 const loginUsuario = async (req, res = response) => {
   const { correo, password } = req.body;
 
@@ -217,7 +213,7 @@ const loginUsuario = async (req, res = response) => {
     // Clave secreta para firmar el token
     const privateKey = "clave";
 
-    jwt.sign(payload, privateKey, { expiresIn: "1h" }, (error, token) => {
+    jwt.sign(payload, privateKey, { expiresIn: "365d" }, (error, token) => {
       if (error) {
         console.log(error);
         return res.status(500).json({

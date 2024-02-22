@@ -1,6 +1,7 @@
-const { request } = require("express");
+const { request, response } = require("express");
 const Apunte = require("../modules/apunte");
-const mongoose = require('mongoose');
+const { ObjectId } = require("mongoose").Types;
+const mongoose = require("mongoose");
 
 // Controlador para obtener todos los apuntes con paginación y ordenamiento
 const obtenerApuntes = async (req, res) => {
@@ -73,47 +74,41 @@ const crearApunte = async (req, res) => {
   }
 };
 
-// Controlador para actualizar un apunte
-const actualizarApunte = async (req = request, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  const id = req.params.id;
+const actualizarApunte = async (req = request, res = response) => {
+  const { id } = req.usuario;
 
   try {
-    const apunte = await Apunte.findById(id).session(session);
+    const { contenido } = req.body;
+    const titulo = "apunte"; // Cambiado de let a const
 
+    // Intentar actualizar el apunte existente
+    let apunte = await Apunte.findOneAndUpdate(
+      { createdBy: new ObjectId(id) },
+      { contenido },
+      {
+        new: true,
+      }
+    );
+
+    // Si no se encuentra un apunte, crear uno nuevo
     if (!apunte) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({
-        msg: "Apunte no encontrado",
+      apunte = new Apunte({
+        titulo,
+        contenido,
+        createdBy: new ObjectId(id),
       });
+
+      await apunte.save();
     }
 
-    const { titulo, contenido } = req.body;
-
-    apunte.titulo = titulo;
-    apunte.contenido = contenido;
-    apunte.updatedAt = new Date();
-    apunte.updatedBy = req.usuario.id; // Establece el usuario que realiza la actualización
-
-    await apunte.save();
-
-    await session.commitTransaction();
-    session.endSession();
-
     res.status(200).json({
-      msg: "Apunte actualizado correctamente",
+      msg: "Apunte actualizado o creado correctamente",
       apunte,
     });
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-
     console.error(error);
     res.status(500).json({
-      msg: "Error al actualizar el apunte",
+      msg: "Error al actualizar o crear el apunte",
     });
   }
 };
@@ -162,11 +157,11 @@ const eliminarApunteLogico = async (req, res) => {
 
 // Controlador para obtener apuntes por ID de usuario
 const obtenerApuntesPorUsuario = async (req, res) => {
-  const idUsuario = req.params.idUsuario;
+  const { id } = req.usuario;
 
   try {
     const apuntes = await Apunte.find({
-      createdBy: idUsuario,
+      createdBy: id,
       deleted: false,
     });
 
@@ -215,8 +210,7 @@ const actualizarApuntePorUsuario = async (req, res) => {
       msg: "Error al actualizar el apunte",
     });
   }
-}
-
+};
 
 module.exports = {
   obtenerApuntes,
@@ -224,5 +218,5 @@ module.exports = {
   actualizarApunte,
   eliminarApunte: eliminarApunteLogico,
   obtenerApuntesPorUsuario,
-  actualizarApuntePorUsuario
+  actualizarApuntePorUsuario,
 };

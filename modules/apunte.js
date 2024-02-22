@@ -6,7 +6,7 @@ const apunteSchema = new Schema({
     required: [true, "El título es requerido"],
   },
   contenido: {
-    type: [String],
+    type: String,
   },
   createdAt: {
     type: Date,

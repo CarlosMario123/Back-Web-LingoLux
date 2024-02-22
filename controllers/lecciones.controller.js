@@ -152,6 +152,7 @@ const consultarLeccion = async (req, res) => {
       await abortarTransaccion(session);
       return res.status(401).json({
         message: 'Lección bloqueada',
+        requisito:leccion.requisito
       });
     } else {
       await finalizarTransaccionExito(session);

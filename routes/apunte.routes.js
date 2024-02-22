@@ -15,7 +15,11 @@ const routerApuntes = Router();
 
 routerApuntes.get("/", obtenerApuntes);
 
-routerApuntes.get("/usuario/:idUsuario", [authMiddleware], obtenerApuntesPorUsuario);
+routerApuntes.get(
+  "/usuario",
+  [authMiddleware],
+  obtenerApuntesPorUsuario
+);
 
 routerApuntes.post(
   "/",
@@ -27,15 +31,7 @@ routerApuntes.post(
   crearApunte
 );
 
-routerApuntes.put(
-  "/:id",
-  [
-    check("titulo", "El título es obligatorio").not().isEmpty(),
-    validarCampos,
-    authMiddleware,
-  ],
-  actualizarApunte
-);
+routerApuntes.put("/", [authMiddleware,validarCampos], actualizarApunte);
 
 routerApuntes.delete("/:id", [authMiddleware], eliminarApunte);
 

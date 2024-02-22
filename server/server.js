@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { dbConnection } = require("../database/configDB");
+const bodyParser = require("body-parser");
 class ServerApi {
   constructor() {
     this.app = express();
@@ -8,14 +9,14 @@ class ServerApi {
     this.usuariosRoutes = "/API/usuarios";
     this.libroVocRoutes = "/API/libroVocabulario";
     this.libroHisRoutes = "/API/libroHistorias";
-    this.apunte = '/API/apuntes'
-    this.lecciones = '/API/lecciones';
-    this.temas = '/API/temas';
-    this.preguntas = '/API/preguntas'
-    this.palabra = "/API/palabra"
-    this.generador = '/API/generador'
-    this.recursoExterno = '/API/recursoExterno'
-    this.memorama = '/API/memorama'
+    this.apunte = "/API/apuntes";
+    this.lecciones = "/API/lecciones";
+    this.temas = "/API/temas";
+    this.preguntas = "/API/preguntas";
+    this.palabra = "/API/palabra";
+    this.generador = "/API/generador";
+    this.recursoExterno = "/API/recursoExterno";
+    this.memorama = "/API/memorama";
     //Conectar a base de datos
     this.conectarDB();
 
@@ -38,20 +39,32 @@ class ServerApi {
 
     //Directorio publico
     this.app.use(express.static("Public/build"));
+    this.app.use(bodyParser.json());
+  
+    
   }
 
   routes() {
     this.app.use(this.usuariosRoutes, require("../routes/usuarios.routes"));
-    this.app.use(this.libroVocRoutes, require("../routes/librosVocabulario.routes"));
-    this.app.use(this.libroHisRoutes, require("../routes/librosHistorias.routes"));
-    this.app.use(this.apunte, require('../routes/apunte.routes'));
-    this.app.use(this.lecciones, require('../routes/lecciones.route'));
-    this.app.use(this.temas, require('../routes/temas.route'));
-    this.app.use(this.preguntas, require('../routes/preguntas.route'));
+    this.app.use(
+      this.libroVocRoutes,
+      require("../routes/librosVocabulario.routes")
+    );
+    this.app.use(
+      this.libroHisRoutes,
+      require("../routes/librosHistorias.routes")
+    );
+    this.app.use(this.apunte, require("../routes/apunte.routes"));
+    this.app.use(this.lecciones, require("../routes/lecciones.route"));
+    this.app.use(this.temas, require("../routes/temas.route"));
+    this.app.use(this.preguntas, require("../routes/preguntas.route"));
     this.app.use(this.palabra, require("../routes/palabra.routes"));
     this.app.use(this.generador, require("../routes/generador.routes"));
-    this.app.use(this.recursoExterno, require('../routes/recursosExternos.routes'));
-    this.app.use(this.memorama, require('../routes/memorama.routes'));
+    this.app.use(
+      this.recursoExterno,
+      require("../routes/recursosExternos.routes")
+    );
+    this.app.use(this.memorama, require("../routes/memorama.routes"));
   }
 
   listen() {

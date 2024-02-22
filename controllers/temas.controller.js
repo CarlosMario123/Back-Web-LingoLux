@@ -1,6 +1,6 @@
 const Tema = require("../modules/temas");
 const Usuario = require("../modules/usuario");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const obtenerTemas = async (req, res) => {
   const session = await mongoose.startSession();
@@ -9,8 +9,8 @@ const obtenerTemas = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const perPage = parseInt(req.query.perPage) || 10;
-    const sortBy = req.query.sortBy || 'createdAt';
-    const sortOrder = req.query.sortOrder || 'asc';
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder || "asc";
     const skip = (page - 1) * perPage;
     const sortOption = { [sortBy]: sortOrder };
 
@@ -24,15 +24,14 @@ const obtenerTemas = async (req, res) => {
     session.endSession();
 
     return res.status(200).json({ temas });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
 
     console.error(error);
     return res.status(500).json({
-      msg: 'Error al cargar los temas',
-      error: error.message
+      msg: "Error al cargar los temas",
+      error: error.message,
     });
   }
 };
@@ -40,39 +39,30 @@ const obtenerTemas = async (req, res) => {
 const consultarTema = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     const idTema = req.params.id;
-    const tema = await Tema.findById(idTema).populate('leccion', { requisito: 1 }).session(session);
-    const usuario = await Usuario.findById(req.usuario.id).session(session);
+    const tema = await Tema.findById(idTema)
+      .populate("leccion", { requisito: 1 });
+    const usuario = await Usuario.findById(req.usuario.id);
 
     if (!tema) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(404).json({
-        message: 'Tema no encontrado'
+        message: "Tema no encontrado",
       });
     }
-    if (usuario.can_estrellas < tema.leccion.requisito) {
-      await session.abortTransaction();
-      session.endSession();
+    console.log("tema:" + tema.requisito)
+    if (usuario.can_estrellas < tema.requisito) {
       return res.status(401).json({
-        message: 'Lección bloqueada'
+        message: "Lección bloqueada",
       });
     }
-
-    await session.commitTransaction();
-    session.endSession();
 
     return res.json({ tema });
-
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
 
     console.error(error);
     return res.status(500).json({
-      msg: 'Error al consultar el tema',
+      msg: "Error al consultar el tema",
     });
   }
 };
@@ -82,7 +72,7 @@ const agregarTema = async (req, res) => {
   session.startTransaction();
 
   const { nombre, cuerpo, imagen, idLeccion } = req.body;
-  
+
   try {
     const tema = new Tema({ nombre, cuerpo, imagen, idLeccion });
     await tema.save({ session });
@@ -91,16 +81,15 @@ const agregarTema = async (req, res) => {
     session.endSession();
 
     return res.status(200).json({
-      msg: 'Tema nuevo agregado'
+      msg: "Tema nuevo agregado",
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
 
     console.error(error);
     return res.status(500).json({
-      msg: 'Error al agregar el tema',
+      msg: "Error al agregar el tema",
     });
   }
 };
@@ -110,7 +99,7 @@ const eliminarTema = async (req, res) => {
   session.startTransaction();
 
   const idTema = req.params.id;
-  
+
   try {
     const tema = await Tema.findByIdAndDelete(idTema).session(session);
 
@@ -128,7 +117,6 @@ const eliminarTema = async (req, res) => {
     return res.status(200).json({
       msg: "Tema eliminado correctamente",
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -148,8 +136,16 @@ const editarTema = async (req, res) => {
 
   try {
     const { nombre, cuerpo, imagen, leccion } = req.body;
-    const datosEditar = { nombre, cuerpo, imagen, leccion, updatedAt: new Date() };
-    const tema = await Tema.findByIdAndUpdate(idTema, datosEditar, { new: true }).session(session);
+    const datosEditar = {
+      nombre,
+      cuerpo,
+      imagen,
+      leccion,
+      updatedAt: new Date(),
+    };
+    const tema = await Tema.findByIdAndUpdate(idTema, datosEditar, {
+      new: true,
+    }).session(session);
 
     if (!tema) {
       await session.abortTransaction();
@@ -163,9 +159,8 @@ const editarTema = async (req, res) => {
     session.endSession();
 
     return res.status(200).json({
-      msg: "Tema actualizado correctamente"
+      msg: "Tema actualizado correctamente",
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -182,5 +177,5 @@ module.exports = {
   consultarTema,
   agregarTema,
   eliminarTema,
-  editarTema
+  editarTema,
 };

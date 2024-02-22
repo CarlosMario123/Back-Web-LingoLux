@@ -18,19 +18,16 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 const routerUsuario = Router();
 
 routerUsuario.get("/", usuariosGet);
+routerUsuario.get("/top", obtenerTopUsuarios); // New route to get top users
+routerUsuario.get("/:id",
+  [
+    check("id", "El id no es valido").isMongoId(),
+    check("id", "El id no existe").custom(existeID),
+  ],
+  obtenerUsuarioID
+);
 
-routerUsuario.get('/',obtenerUsuarioID)
-
-routerUsuario.get('/top', obtenerTopUsuarios); // New route to get top users
-
-
-routerUsuario.get('/:id',[
-  check('id','El id no es valido').isMongoId(),
-  check('id', 'El id no existe').custom(existeID),
-  validarCampos
-],obtenerUsuarioID)
-
-routerUsuario.put("/:id",authMiddleware ,usuariosPut);
+routerUsuario.put("/:id", authMiddleware, usuariosPut);
 
 routerUsuario.post(
   "/",
